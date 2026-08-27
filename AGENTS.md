@@ -179,10 +179,14 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 
 ## Продакшн (Railway)
 
-- **Публичная ссылка:** https://<NEW-DOMAIN>.up.railway.app (гость), `/admin.html` (владелец, токен `dev-token`)
-- Railway: проект `call-booking`, сервис перепривязан на репо `ai-for-developers-project-387` (сборка по `Dockerfile`, запуск по `PORT`, `OWNER_TOKEN=dev-token`); пуш в `main` → автодеплой.
-- Деплой **ручной** (`railway up` из корня репо) больше не нужен — GitHub-подключение раздаёт автоматически, но остаётся fallback'ом.
-- `railway_redeploy` (MCP) переиспользует **старую сборку** — для выката нового кода не годится, только пуш в `main` или `railway up`.
+- **Публичная ссылка:** https://ai-for-developers-project-387-production-bb87.up.railway.app (гость), `/admin.html` (владелец, токен `dev-token`)
+- Railway: проект `call-booking`, сервис `ai-for-developers-project-387` (id `49253e1a-9ca4-4721-b841-3dca4a903012`, env `9321b469-edbd-46e1-9589-11b661561937`). Сборка по `Dockerfile` из корня репо, запуск по `PORT`, `OWNER_TOKEN=dev-token`.
+- Деплой **строго ручной** через Railway CLI из корня репозитория (GitHub-подключение **отвязано** — пуш в `main` деплой НЕ триггерит):
+  ```bash
+  railway up --service ai-for-developers-project-387 --environment production --project 736cb113-e32d-4e75-8836-73c6657a5bc2 --message "описание"
+  ```
+  CLI установлен локально (`~/.railway/bin/railway`, авторизация через `railway login`).
+- `railway_redeploy` (MCP) переиспользует **старую сборку** — для выката нового кода не годится, только `railway up`.
 - Сеть пользователя блокирует домен без VPN — для проверок прод-ссылки включать VPN.
 - Данные in-memory: каждый деплой сбрасывает типы событий и бронирования.
 

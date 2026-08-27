@@ -15,10 +15,10 @@
 
 ## Публичное приложение
 
-- **Гость (бронирование):** https://<NEW-DOMAIN>.up.railway.app
-- **Владелец (админка):** https://<NEW-DOMAIN>.up.railway.app/admin.html — токен `dev-token`
+- **Гость (бронирование):** https://ai-for-developers-project-387-production-bb87.up.railway.app
+- **Владелец (админка):** https://ai-for-developers-project-387-production-bb87.up.railway.app/admin.html — токен `dev-token`
 
-Деплой: Railway, из GitHub по `Dockerfile` (один контейнер: axum раздаёт и API, и статику). Запуск по порту из `PORT`. Хранилище пока in-memory — данные сбрасываются при каждом деплое.
+Деплой: Railway, **ручной** (`railway up` из корня репо, GitHub не подключён), сборка по `Dockerfile` (один контейнер: axum раздаёт и API, и статику). Запуск по порту из `PORT`. Хранилище пока in-memory — данные сбрасываются при каждом деплое.
 
 ## Стек
 

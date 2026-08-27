@@ -66,7 +66,7 @@ e2e/                     # интеграционные e2e-тесты (Playwrig
   scenarios.md           # описание пользовательских сценариев
 .github/workflows/       # ci.yml (тесты), release-please.yml (релизы), hexlet-check.yml (не трогать)
 release-please-config.json    # конфиг release-please (release-type: rust, пакет backend)
-.release-please-manifest.json # версия backend (0.3.0)
+.release-please-manifest.json # версия backend (0.4.0)
 Dockerfile                 # multi-stage: Rust-бинарь + статика фронтенда
 docker-compose.yml         # локальный запуск из Docker-образа
 .dockerignore              # контекст сборки — корень репозитория
@@ -216,7 +216,7 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 6. Язык общения с пользователем — **русский**.
 7. **Все коммиты — только по Conventional Commits** (см. «Коммиты и релизы» ниже), в том числе коммиты, которые делает агент.
 8. **Мёрдж любых PR (включая release-PR от release-please) делает только пользователь** — агент PR не аппрувит и не мёрджит.
-9. Если release-please после мержа не создал GitHub Release: вероятная причина — HEAD `main` содержит изменения `.github/workflows/`, а `GITHUB_TOKEN` не может создавать релизы по коммитам, меняющим workflow (GitHub API: для этого нужны права на модификацию workflow). Лечится пушем коммита, НЕ трогающего `.github/workflows/` (например `docs:`), после чего release-please отработает по нему.
+9. Если release-please после мержа не создал GitHub Release (ошибка `Resource not accessible by integration`): причина — в истории `main` между merge-коммитом release-PR и HEAD есть коммит, изменяющий `.github/workflows/`. GitHub требует для создания release права на модификацию workflow, а `GITHUB_TOKEN` их не имеет. Лечится переписыванием истории (`git rebase --onto`), чтобы такой коммит не входил в `main` до выката релиза; после релиза workflow-коммит можно вернуть отдельным пушем.
 
 ## Коммиты и релизы (Conventional Commits + release-please)
 

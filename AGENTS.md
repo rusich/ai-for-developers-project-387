@@ -215,6 +215,8 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 5. Docker локально установлен (`just docker-build` / `just docker-run`); прод-деплой — ручной `railway up` по `Dockerfile` (см. «Продакшн (Railway)»).
 6. Язык общения с пользователем — **русский**.
 7. **Все коммиты — только по Conventional Commits** (см. «Коммиты и релизы» ниже), в том числе коммиты, которые делает агент.
+8. **Мёрдж любых PR (включая release-PR от release-please) делает только пользователь** — агент PR не аппрувит и не мёрджит.
+9. Если release-please после мержа не создал GitHub Release: вероятная причина — HEAD `main` содержит изменения `.github/workflows/`, а `GITHUB_TOKEN` не может создавать релизы по коммитам, меняющим workflow (GitHub API: для этого нужны права на модификацию workflow). Лечится пушем коммита, НЕ трогающего `.github/workflows/` (например `docs:`), после чего release-please отработает по нему.
 
 ## Коммиты и релизы (Conventional Commits + release-please)
 

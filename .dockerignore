@@ -1,0 +1,15 @@
+# Контекст сборки Docker — корень репозитория. Исключаем лишнее.
+
+# VCS
+.git
+
+# Зависимости и артефакты сборки
+**/node_modules
+**/target
+spec/tsp-output
+e2e/test-results
+e2e/playwright-report
+
+# Локальное окружение
+.env
+*.log

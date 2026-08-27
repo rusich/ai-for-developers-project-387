@@ -1,0 +1,401 @@
+openapi: 3.0.0
+info:
+  title: Call Booking
+  version: 1.0.0
+tags: []
+paths:
+  /api/bookings:
+    post:
+      operationId: Bookings_book
+      description: Забронировать свободный слот
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingRequest'
+    get:
+      operationId: Bookings_list
+      description: Получить список предстоящих бронирований (все типы событий). Требует заголовок X-Owner-Token.
+      parameters:
+        - name: X-Owner-Token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/event-types:
+    get:
+      operationId: EventTypes_list
+      description: Получить список всех типов событий
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+    post:
+      operationId: EventTypes_create
+      description: Создать новый тип события. Требует заголовок X-Owner-Token.
+      parameters:
+        - name: X-Owner-Token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeCreate'
+  /api/event-types/{id}:
+    get:
+      operationId: EventTypes_get
+      description: Получить тип события по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      operationId: EventTypes_update
+      description: Обновить тип события. Требует заголовок X-Owner-Token.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-Owner-Token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeUpdate'
+    delete:
+      operationId: EventTypes_remove
+      description: Удалить тип события. Требует заголовок X-Owner-Token.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-Owner-Token
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/event-types/{id}/slots:
+    get:
+      operationId: EventTypes_slots
+      description: Получить слоты на 14 дней начиная с from (по умолчанию — сегодня). Окно 09:00–18:00 UTC, слоты по 30 минут.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/version:
+    get:
+      operationId: Version_get
+      description: Получить версию приложения
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionInfo'
+components:
+  schemas:
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - start
+        - end
+        - attendeeName
+        - attendeeEmail
+      properties:
+        id:
+          type: string
+          description: Уникальный идентификатор бронирования
+        eventTypeId:
+          type: string
+          description: Идентификатор типа события
+        start:
+          type: string
+          format: date-time
+          description: Начало бронирования (UTC, ISO 8601)
+        end:
+          type: string
+          format: date-time
+          description: Конец бронирования (UTC, ISO 8601)
+        attendeeName:
+          type: string
+          minLength: 1
+          description: Имя гостя
+        attendeeEmail:
+          type: string
+          format: email
+          description: Email гостя
+      description: Созданное бронирование
+    BookingRequest:
+      type: object
+      required:
+        - eventTypeId
+        - start
+        - attendeeName
+        - attendeeEmail
+      properties:
+        eventTypeId:
+          type: string
+          description: Идентификатор типа события
+        start:
+          type: string
+          format: date-time
+          description: Начало бронируемого слота (UTC, ISO 8601)
+        attendeeName:
+          type: string
+          minLength: 1
+          description: Имя гостя
+        attendeeEmail:
+          type: string
+          format: email
+          description: Email гостя
+      description: Запрос на создание бронирования
+    Error:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+          description: URI-идентификатор типа ошибки
+        title:
+          type: string
+          description: Краткое читаемое название ошибки
+        status:
+          type: integer
+          format: int32
+          description: HTTP-статус код
+        detail:
+          type: string
+          description: Детальное описание ошибки
+      description: Ошибка в формате RFC7807 (Problem Details)
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          description: Уникальный идентификатор
+        title:
+          type: string
+          minLength: 1
+          description: Название типа события
+        description:
+          type: string
+          description: Описание типа события
+      description: Тип события, который создаёт владелец
+    EventTypeCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+      description: Запрос на создание типа события
+    EventTypeUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+      description: Запрос на обновление типа события (все поля необязательны)
+    Slot:
+      type: object
+      required:
+        - start
+        - end
+        - available
+      properties:
+        start:
+          type: string
+          format: date-time
+          description: Начало слота (UTC, ISO 8601)
+        end:
+          type: string
+          format: date-time
+          description: Конец слота (UTC, ISO 8601)
+        available:
+          type: boolean
+          description: true, если слот свободен и доступен для бронирования
+      description: Временной слот для бронирования
+    VersionInfo:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: string
+          description: Версия приложения (из Cargo.toml)
+      description: Информация о версии приложения

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Запись на звонок</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Запись на звонок</h1>
+
+    <!-- Шаг 1: выбор типа события -->
+    <section id="step-type">
+      <h2>1. Выберите тип встречи</h2>
+      <div id="event-types" class="cards">
+        <p class="muted">Загрузка…</p>
+      </div>
+    </section>
+
+    <!-- Шаг 2: выбор слота -->
+    <section id="step-slot" hidden>
+      <h2>2. Выберите время <span id="chosen-type" class="muted"></span></h2>
+      <div id="days" class="days"></div>
+      <div id="slots" class="slots"></div>
+      <p id="slots-empty" class="muted" hidden>Нет свободных слотов в этом окне.</p>
+    </section>
+
+    <!-- Шаг 3: данные гостя -->
+    <section id="step-form" hidden>
+      <h2>3. Ваши данные</h2>
+      <p>Вы записываетесь на <strong id="chosen-slot"></strong></p>
+      <form id="booking-form" novalidate>
+        <label>
+          Имя
+          <input type="text" name="attendeeName" required minlength="1" autocomplete="name">
+        </label>
+        <label>
+          Email
+          <input type="email" name="attendeeEmail" required autocomplete="email">
+        </label>
+        <div class="form-actions">
+          <button type="submit">Забронировать</button>
+          <button type="button" id="back-to-slots" class="secondary">Назад</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Шаг 4: успех -->
+    <section id="step-done" hidden>
+      <h2>Готово!</h2>
+      <p id="confirmation"></p>
+      <button id="book-another" class="secondary">Записаться ещё раз</button>
+    </section>
+
+    <p id="error" class="error" role="alert" hidden></p>
+  </main>
+
+  <footer class="footer">
+    <span id="app-version" class="muted"></span>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

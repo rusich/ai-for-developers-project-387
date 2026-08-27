@@ -1,0 +1,22 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Единый компонент — crate call-booking-backend. Включаем имя компонента
+          # в тег, чтобы теги совпадали с ссылками в changelog и поиском прошлых
+          # релизов (теги вида call-booking-backend-vX.Y.Z).
+          include-component-in-tag: true

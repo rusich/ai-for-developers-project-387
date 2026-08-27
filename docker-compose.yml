@@ -1,0 +1,12 @@
+# Локальный запуск приложения из Docker-образа.
+# Postgres добавим на этапе БД/миграций (сейчас хранилище in-memory).
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      OWNER_TOKEN: "dev-token"

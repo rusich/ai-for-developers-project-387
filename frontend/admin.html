@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админка — Запись на звонок</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Кабинет владельца</h1>
+
+    <!-- Ввод токена -->
+    <section id="token-gate" hidden>
+      <p>Введите токен владельца (значение <code>X-Owner-Token</code>):</p>
+      <form id="token-form">
+        <label>
+          Токен
+          <input type="password" name="token" required autocomplete="off">
+        </label>
+        <button type="submit">Войти</button>
+      </form>
+    </section>
+
+    <div id="admin" hidden>
+      <div class="admin-header">
+        <button id="logout" class="secondary">Сменить токен</button>
+      </div>
+
+      <!-- Типы событий -->
+      <section>
+        <h2>Типы событий</h2>
+        <form id="event-type-form" novalidate>
+          <input type="hidden" name="id">
+          <label>
+            Название
+            <input type="text" name="title" required minlength="1">
+          </label>
+          <label>
+            Описание (необязательно)
+            <input type="text" name="description">
+          </label>
+          <div class="form-actions">
+            <button type="submit" id="event-type-submit">Создать</button>
+            <button type="button" id="event-type-cancel" class="secondary" hidden>Отмена</button>
+          </div>
+        </form>
+        <ul id="event-types-list" class="list"></ul>
+      </section>
+
+      <!-- Предстоящие встречи -->
+      <section>
+        <h2>Предстоящие встречи</h2>
+        <table id="bookings-table">
+          <thead>
+            <tr>
+              <th>Когда</th>
+              <th>Тип</th>
+              <th>Гость</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p id="bookings-empty" class="muted" hidden>Предстоящих встреч нет.</p>
+      </section>
+    </div>
+
+    <p id="error" class="error" role="alert" hidden></p>
+  </main>
+
+  <footer class="footer">
+    <span id="app-version" class="muted"></span>
+  </footer>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

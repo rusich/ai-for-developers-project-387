@@ -1,0 +1,18 @@
+{
+  "name": "call-booking-spec",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TypeSpec API contract for Call Booking (simplified Cal.com)",
+  "scripts": {
+    "compile": "tsp compile . && mkdir -p openapi && cp tsp-output/@typespec/openapi3/openapi.yaml openapi/openapi.yaml"
+  },
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/openapi": "latest",
+    "@typespec/openapi3": "latest"
+  },
+  "devDependencies": {
+    "@typespec/versioning": "latest"
+  }
+}

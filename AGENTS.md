@@ -17,7 +17,7 @@
 
 | Вопрос | Решение |
 |---|---|
-| Стек бэкенда | **Rust + axum + sqlx + PostgreSQL** + serde + validator |
+| Стек бэкенда | **Rust + axum** + serde + validator (in-memory, без БД) |
 | Стек фронтенда | **Vanilla HTML/JS + fetch** (без сборщиков, пользователь слаб во фронте) |
 | Контракт | **TypeSpec** → OpenAPI 3.0 (НЕ utoipa-аннотации в коде) |
 | Слоты | Фиксированные **30 минут**, окно **09:00–18:00 UTC**, **все 7 дней** недели, на **14 дней** вперёд от `from` (по умолчанию сегодня) |
@@ -27,7 +27,7 @@
 | Отмена бронирования | **Нет** (бронирование финально) |
 | Правило занятости | Unique по `start` в `bookings` → повторное бронирование того же времени → **409 Conflict** (даже для разных типов событий) |
 | Ошибки | Единый формат **RFC7807**: `{ type, title, status, detail }` |
-| Хранилище | **In-memory** (данные сбрасываются при перезапуске/деплое). Postgres + sqlx — **отложено**, начинать только когда задание явно потребует БД |
+| Хранилище | **In-memory** (данные сбрасываются при перезапуске/деплое) |
 | Переменные окружения | `PORT` (default 3000), `OWNER_TOKEN` (default dev-token), `STATIC_DIR` (default frontend) |
 | Порт бэкенда | **3000** (axum default); dev-стаб на Node — порт 4010 (fallback) |
 | Деплой | Один Docker-контейнер: **axum раздаёт и API, и статику** (без отдельного nginx); прод: Railway, деплой **ручной** (`railway up` из корня репо, сборка по `Dockerfile`, запуск по `PORT`, `OWNER_TOKEN=dev-token`); публичная ссылка в README |
@@ -67,6 +67,7 @@ e2e/                     # интеграционные e2e-тесты (Playwrig
 .github/workflows/       # ci.yml (тесты), release-please.yml (релизы), hexlet-check.yml (не трогать)
 release-please-config.json    # конфиг release-please (release-type: rust, пакет backend)
 .release-please-manifest.json # версия backend (0.4.0)
+ROADMAP.md                 # план развития UI/UX (задачи → GitHub issues)
 Dockerfile                 # multi-stage: Rust-бинарь + статика фронтенда
 docker-compose.yml         # локальный запуск из Docker-образа
 .dockerignore              # контекст сборки — корень репозитория
@@ -126,7 +127,7 @@ just e2e            # интеграционные e2e-тесты (4 теста 
 just dev            # бэкенд 3000 + фронт 8080, Ctrl+C гасит оба
 ```
 
-Продолжить с незакрытых пунктов чеклиста «Прогресс» (ниже). БД/миграции (Этап 2) — **намеренно отложены**: начинать только когда конкретное задание курса явно потребует БД, не раньше.
+Продолжить с незакрытых пунктов чеклиста «Прогресс» (ниже) и плана развития в `ROADMAP.md`. Продуктовый функционал **заморожен** — развивается только UI/UX по задачам из роадмапа (выполняются через GitHub issues/PR).
 
 **Известный баг окружения (NixOS + rustup):** если `cargo build` падает с
 `ld-wrapper.sh: No such file or directory`, обёртка lld в rustup сломана. Заменить её:
@@ -247,4 +248,4 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 - [x] Этап 5: Тесты (cargo test: 4 юнит слотов + 11 интеграционных; smoke-test.mjs против Rust: 24 ok)
 - [x] Этап 7: Интеграционные e2e (Playwright, реальный Chromium, основной сценарий бронирования) + CI + release-please
 - [x] Этап 6: Деплой (Dockerfile multi-stage в корне, axum раздаёт API+статику, запуск по `PORT`) — задеплоено на Railway, ссылка в README
-- [ ] Этап 2: БД и миграции (sqlx, таблицы `event_types`, `bookings` с unique по `start`) — **отложено**, начинать только когда задание курса явно потребует БД
+- [x] Этап 8: Роадмап развития (`ROADMAP.md`) — план UI/UX, задачи выполняются через GitHub issues/PR

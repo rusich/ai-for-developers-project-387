@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/rusich/ai-for-developers-project-387/compare/call-booking-backend-v0.3.0...call-booking-backend-v0.4.0) (2026-08-27)
+
+
+### Features
+
+* port call-booking app to part-2 repository ([fed2c0e](https://github.com/rusich/ai-for-developers-project-387/commit/fed2c0e8a94ad1b41c4d8c506ffc0b44a6bb2494))
+
 ## [0.3.0](https://github.com/rusich/ai-for-developers-project-386/compare/call-booking-backend-v0.2.1...call-booking-backend-v0.3.0) (2026-08-27)
 
 

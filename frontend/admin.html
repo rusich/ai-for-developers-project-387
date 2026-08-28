@@ -19,7 +19,8 @@
   </script>
 </head>
 <body>
-  <main class="container">
+  <a class="skip-link" href="#main">К содержанию</a>
+  <main id="main" class="container">
     <div class="topbar">
       <button type="button" class="secondary" data-theme-toggle aria-pressed="false">Тема: авто</button>
     </div>
@@ -68,6 +69,7 @@
       <section>
         <h2>Предстоящие встречи</h2>
         <table id="bookings-table">
+          <caption class="sr-only">Предстоящие встречи</caption>
           <thead>
             <tr>
               <th>Когда</th>
@@ -78,7 +80,7 @@
           </thead>
           <tbody></tbody>
         </table>
-        <p id="bookings-empty" class="empty-state" hidden>Предстоящих встреч нет.</p>
+        <p id="bookings-empty" class="empty-state" hidden aria-live="polite">Предстоящих встреч нет.</p>
       </section>
     </div>
 

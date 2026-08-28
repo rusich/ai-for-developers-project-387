@@ -19,7 +19,8 @@
   </script>
 </head>
 <body>
-  <main class="container">
+  <a class="skip-link" href="#main">К содержанию</a>
+  <main id="main" class="container">
     <div class="topbar">
       <button type="button" class="secondary" data-theme-toggle aria-pressed="false">Тема: авто</button>
     </div>
@@ -38,7 +39,7 @@
       <h2>2. Выберите время <span id="chosen-type" class="muted"></span></h2>
       <div id="days" class="days"></div>
       <div id="slots" class="slots"></div>
-      <p id="slots-empty" class="empty-state" hidden></p>
+      <p id="slots-empty" class="empty-state" hidden aria-live="polite"></p>
     </section>
 
     <!-- Шаг 3: данные гостя -->
@@ -62,7 +63,7 @@
     </section>
 
     <!-- Шаг 4: успех -->
-    <section id="step-done" hidden>
+    <section id="step-done" hidden role="status">
       <div class="done">
         <span class="done-icon" aria-hidden="true">✓</span>
         <h2>Готово!</h2>

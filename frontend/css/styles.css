@@ -655,6 +655,66 @@ code {
   font-size: 0.9em;
 }
 
+/* ── Микро-анимации и переходы ───────────────────────────────
+   Плавная смена шагов бронирования: при снятии hidden секция
+   проявляется и слегка приподнимается (анимация запускается
+   каждый раз, когда элемент снова становится видимым). */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#step-slot:not([hidden]),
+#step-form:not([hidden]),
+#step-done:not([hidden]),
+#token-gate:not([hidden]),
+#admin:not([hidden]) {
+  animation: step-in 220ms ease both;
+}
+
+/* Плавное появление контента, который перерисовывается через innerHTML:
+   карточки типов, строки списка админки и строки таблицы встреч. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card,
+.list li,
+tbody tr {
+  animation: fade-in 200ms ease both;
+}
+
+/* Иконка «Готово!» появляется с лёгким «пружинным» масштабированием. */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.done-icon {
+  animation: pop-in 320ms ease both;
+}
+
 /* ── Доступность ───────────────────────────────────────────── */
 
 /* Ссылка «к содержанию»: прячет вне экрана, показывает по фокусу

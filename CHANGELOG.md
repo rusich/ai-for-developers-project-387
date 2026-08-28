@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.1](https://github.com/rusich/ai-for-developers-project-387/compare/v0.5.0...v0.5.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* **frontend:** fix spacing of #step-done blocks ([1edcf0c](https://github.com/rusich/ai-for-developers-project-387/commit/1edcf0c2a5ef5aeb251056937d8fcc07946c7965))
+* **frontend:** show guest page dates in Russian and 24-hour format ([#7](https://github.com/rusich/ai-for-developers-project-387/issues/7)) ([40f4da0](https://github.com/rusich/ai-for-developers-project-387/commit/40f4da078081ba9cbf00fd8361afcc700b455169))
+
+
+### Documentation
+
+* document railway deploy verification commands ([a44a539](https://github.com/rusich/ai-for-developers-project-387/commit/a44a53918afe9ae702da8bb794f9bc7fc04936c1))
+
+
+### Build
+
+* **release-please:** drop backend component from release naming ([bddc8cd](https://github.com/rusich/ai-for-developers-project-387/commit/bddc8cd2642e4a850ffc6639307e03f9c84c2875))
+
 ## [0.5.0](https://github.com/rusich/ai-for-developers-project-387/compare/call-booking-backend-v0.4.0...call-booking-backend-v0.5.0) (2026-08-28)
 
 

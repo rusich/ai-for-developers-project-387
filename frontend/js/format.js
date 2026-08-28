@@ -1,21 +1,23 @@
 // Форматирование дат: сервер отдаёт UTC (ISO 8601), UI показывает локальное время.
 
-const timeFormatter = new Intl.DateTimeFormat(undefined, {
+const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
   hour: '2-digit',
   minute: '2-digit',
+  hour12: false,
 });
 
-const dayFormatter = new Intl.DateTimeFormat(undefined, {
+const dayFormatter = new Intl.DateTimeFormat('ru-RU', {
   weekday: 'short',
   day: 'numeric',
   month: 'short',
 });
 
-const fullFormatter = new Intl.DateTimeFormat(undefined, {
+const fullFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: 'numeric',
   month: 'long',
   hour: '2-digit',
   minute: '2-digit',
+  hour12: false,
 });
 
 // "12:00"

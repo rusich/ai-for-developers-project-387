@@ -366,7 +366,46 @@ tbody tr:hover {
 
 .admin-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Ссылки в виде кнопок ─────────────────────────────────── */
+
+a.button-link {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--accent);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+a.button-link:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+a.button-link:active {
+  transform: translateY(1px);
+}
+
+a.button-link:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .error {

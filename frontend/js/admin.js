@@ -216,16 +216,22 @@ function renderBookings() {
     (a, b) => new Date(a.start) - new Date(b.start),
   );
 
+  // Подписи колонок нужны и таблице (thead), и мобильным «карточкам»
+  // (CSS берёт их из data-label через ::before — см. styles.css).
+  const labels = ['Когда', 'Тип', 'Гость', 'Email'];
+
   for (const b of sorted) {
     const tr = document.createElement('tr');
-    for (const value of [
+    const values = [
       formatDateTime(b.start),
       typeById.get(b.eventTypeId) ?? '—',
       b.attendeeName,
       b.attendeeEmail,
-    ]) {
+    ];
+    for (const [i, value] of values.entries()) {
       const td = document.createElement('td');
       td.textContent = value;
+      td.setAttribute('data-label', labels[i]);
       tr.append(td);
     }
     els.bookingsBody.append(tr);

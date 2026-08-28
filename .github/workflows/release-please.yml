@@ -16,7 +16,8 @@ jobs:
       - uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Единый компонент — crate call-booking-backend. Включаем имя компонента
-          # в тег, чтобы теги совпадали с ссылками в changelog и поиском прошлых
-          # релизов (теги вида call-booking-backend-vX.Y.Z).
+          # Единый пакет объявлен на корне репозитория (путь "." в
+          # release-please-config.json), релизный компонент — call-booking-backend.
+          # Включаем имя компонента в тег, чтобы теги совпадали с прошлыми
+          # релизами и ссылками в changelog (теги вида call-booking-backend-vX.Y.Z).
           include-component-in-tag: true

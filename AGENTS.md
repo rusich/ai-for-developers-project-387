@@ -56,7 +56,6 @@ backend/                 # Rust + axum (in-memory), раздаёт API + ста�
   # build_app(state, STATIC_DIR) — API + статика фронтенда (прод/Docker);
   # build_router(state) — только API, без статики (используется в тестах)
   tests/api.rs           # 11 интеграционных тестов + 4 юнит-теста слотов
-  CHANGELOG.md           # changelog релизов (ведёт release-please)
 tools/                   # dev-инструменты, node_modules в .gitignore
   stub-server.mjs        # stateful dev-стаб API на Node (fallback, порт 4010)
   (prism-cli)            # stateless-мок, только для проверки схем OpenAPI
@@ -65,8 +64,9 @@ e2e/                     # интеграционные e2e-тесты (Playwrig
   tests/booking-flow.spec.ts  # основной сценарий бронирования (4 теста, serial)
   scenarios.md           # описание пользовательских сценариев
 .github/workflows/       # ci.yml (тесты), release-please.yml (релизы), hexlet-check.yml (не трогать)
-release-please-config.json    # конфиг release-please (release-type: rust, пакет backend)
-.release-please-manifest.json # версия backend (0.4.0)
+release-please-config.json    # конфиг release-please (пакет на корне ".", release-type: rust)
+.release-please-manifest.json # версия релизного компонента call-booking-backend (0.4.0)
+CHANGELOG.md                  # changelog релизов (ведёт release-please, в корне репо)
 ROADMAP.md                 # план развития UI/UX (задачи → GitHub issues)
 Dockerfile                 # multi-stage: Rust-бинарь + статика фронтенда
 docker-compose.yml         # локальный запуск из Docker-образа
@@ -215,13 +215,13 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 4. Реализация фронта и бэка — строго по контракту, без заглядывания в реализацию другой части.
 5. Docker локально установлен (`just docker-build` / `just docker-run`); прод-деплой — ручной `railway up` по `Dockerfile` (см. «Продакшн (Railway)»).
 6. Язык общения с пользователем — **русский**.
-7. **Все коммиты — только по Conventional Commits** (см. «Коммиты и релизы» ниже), в том числе коммиты, которые делает агент.
+7. **Строгое соблюдение Conventional Commits**: ВСЕ коммиты — только по Conventional Commits, включая коммиты агента (см. «Коммиты и релизы» ниже). Любой отход от формата недопустим: из типов коммитов вычисляются версия релиза и changelog.
 8. **Мёрдж любых PR (включая release-PR от release-please) делает только пользователь** — агент PR не аппрувит и не мёрджит.
 9. Если release-please после мержа не создал GitHub Release (ошибка `Resource not accessible by integration`): причина — в истории `main` между merge-коммитом release-PR и HEAD есть коммит, изменяющий `.github/workflows/`. GitHub требует для создания release права на модификацию workflow, а `GITHUB_TOKEN` их не имеет. Лечится переписыванием истории (`git rebase --onto`), чтобы такой коммит не входил в `main` до выката релиза; после релиза workflow-коммит можно вернуть отдельным пушем.
 
 ## Коммиты и релизы (Conventional Commits + release-please)
 
-**Все коммиты — только по спецификации Conventional Commits**:
+**Соблюдение Conventional Commits — строго обязательное требование для любого коммита в репозитории** (ручные и агентские, всё, что попадает в `main`). Версия релиза и changelog рассчитываются автоматически из типов коммитов, поэтому отклонение от формата «ломает» релиз:
 
 - `feat:` — новая возможность → **MINOR**
 - `fix:` — исправление бага → **PATCH**
@@ -229,12 +229,13 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 - Breaking change: `feat!:` / `fix!:` или строка `BREAKING CHANGE:` в теле → **MAJOR**
 - Формат: `тип(область): описание`, например `feat: add owner dashboard`.
 
-**release-please** (`release-please-config.json`, `.release-please-manifest.json`, `release-type: rust` для пакета `backend`)
-анализирует коммиты на `main` и сам ведёт релизы:
+**release-please** (`release-please-config.json`, `.release-please-manifest.json`) настроен на **один пакет на корне репозитория** (путь `"."`, `release-type: rust`). Это сделано намеренно: релиз должен двигаться при изменении **любой** части проекта (сейчас продукт развивается только во фронтенде, а бэкенд заморожен — иначе релизы стояли бы на месте). Правила:
 
-- пуш в `main` → workflow `release-please.yml` создаёт/обновляет **release-PR** с changelog и предложенной версией;
-- `release-type: rust` поднимает `version` в `backend/Cargo.toml` и `backend/Cargo.lock` в том же PR — версия везде синхронна (бэкенд отдаёт её через `GET /api/version`, фронт показывает в подвале);
-- компонент релиза — crate `call-booking-backend` (имя из Cargo.toml), поэтому release-PR и теги имеют вид `chore(main): release call-booking-backend 0.x.y` и `call-booking-backend-v0.x.y` (`include-component-in-tag: true`); changelog лежит в `backend/CHANGELOG.md`;
+- пакет объявлен на **корне репо** → в расчёт берутся conventional-коммиты из всего дерева: фронтенд, бэкенд, спека, e2e, инструменты — любой `feat:`/`fix:` везде двигает версию (фронтовый `feat:` → **MINOR**);
+- версия релиза пишется в `backend/Cargo.toml` и `backend/Cargo.lock` — через `extra-files` (jsonpath `$.package.version` и фильтр по `name` в `[[package]]`); версия в `main`-манифесте хранится по ключу `"."`;
+- пуш в `main` → workflow `release-please.yml` создаёт/обновляет **release-PR** с changelog (`CHANGELOG.md` в корне) и предложенной версией;
+- релизный компонент — `call-booking-backend` (`package-name` в конфиге), поэтому release-PR и теги имеют вид `chore(main): release call-booking-backend 0.x.y` и `call-booking-backend-v0.x.y` (`include-component-in-tag: true`) — совпадает с прошлыми релизами;
+- синхронность версий: бэкенд отдаёт её через `GET /api/version`, фронт показывает в подвале;
 - мёрдж release-PR → GitHub Release + тег + changelog;
 - после мёрджа release-please делает авто-коммит `chore(main): release <версия>` — это нормально, трогать его не нужно.
 

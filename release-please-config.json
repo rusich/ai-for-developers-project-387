@@ -1,7 +1,9 @@
 {
   "packages": {
-    "backend": {
+    ".": {
       "release-type": "rust",
+      "package-name": "call-booking-backend",
+      "changelog-path": "CHANGELOG.md",
       "changelog-sections": [
         { "type": "feat", "section": "Features" },
         { "type": "fix", "section": "Bug Fixes" },
@@ -13,6 +15,18 @@
         { "type": "chore", "section": "Miscellaneous Chores" },
         { "type": "style", "section": "Style" },
         { "type": "build", "section": "Build" }
+      ],
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "backend/Cargo.toml",
+          "jsonpath": "$.package.version"
+        },
+        {
+          "type": "toml",
+          "path": "backend/Cargo.lock",
+          "jsonpath": "$.package[?(@.name.value=='call-booking-backend')].version"
+        }
       ]
     }
   }

@@ -13,6 +13,7 @@ import {
   formatDateTime,
   localDayKey,
 } from './format.js';
+import { setFieldError, clearFieldErrors, setBusy } from './ui.js';
 
 const state = {
   eventTypes: [],
@@ -21,6 +22,8 @@ const state = {
   dayKey: null,      // выбранный локальный день (YYYY-MM-DD)
   slot: null,        // выбранный слот
 };
+
+const todayKey = localDayKey(new Date().toISOString());
 
 const els = {
   stepType: document.querySelector('#step-type'),
@@ -34,8 +37,10 @@ const els = {
   slotsEmpty: document.querySelector('#slots-empty'),
   chosenSlot: document.querySelector('#chosen-slot'),
   bookingForm: document.querySelector('#booking-form'),
+  bookingSubmit: document.querySelector('#booking-submit'),
   backToSlots: document.querySelector('#back-to-slots'),
   confirmation: document.querySelector('#confirmation'),
+  doneDetails: document.querySelector('#done-details'),
   bookAnother: document.querySelector('#book-another'),
   appVersion: document.querySelector('#app-version'),
   error: document.querySelector('#error'),
@@ -74,7 +79,7 @@ async function loadEventTypes() {
 function renderEventTypes() {
   els.eventTypes.innerHTML = '';
   if (state.eventTypes.length === 0) {
-    els.eventTypes.innerHTML = '<p class="muted">Пока нет доступных типов встреч.</p>';
+    els.eventTypes.innerHTML = '<p class="empty-state">Пока нет доступных типов встреч.</p>';
     return;
   }
   for (const et of state.eventTypes) {
@@ -102,7 +107,7 @@ async function selectEventType(et) {
   state.eventType = et;
   state.slot = null;
   els.chosenType.textContent = `— ${et.title}`;
-  els.slots.innerHTML = '';
+  els.slots.innerHTML = '<p class="empty-state">Загружаем слоты…</p>';
   els.days.innerHTML = '';
   els.slotsEmpty.hidden = true;
   showStep(els.stepSlot);
@@ -133,17 +138,21 @@ function renderDays() {
   const keys = [...groups.keys()];
   if (keys.length === 0) {
     els.slotsEmpty.hidden = false;
+    els.slotsEmpty.textContent = 'Нет свободных слотов в этом окне.';
     return;
   }
+  // По умолчанию выбираем первый день, где есть свободные слоты (а не просто первый день).
   if (!state.dayKey || !groups.has(state.dayKey)) {
-    state.dayKey = keys[0];
+    state.dayKey = keys.find((k) => groups.get(k).some((s) => s.available)) ?? keys[0];
   }
   for (const key of keys) {
     const daySlots = groups.get(key);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'day';
+    if (key === todayKey) btn.classList.add('today');
     if (key === state.dayKey) btn.classList.add('active');
+    btn.setAttribute('aria-pressed', String(key === state.dayKey));
     btn.textContent = formatDay(daySlots[0].start);
     if (!daySlots.some((s) => s.available)) btn.classList.add('full');
     btn.addEventListener('click', () => {
@@ -159,13 +168,21 @@ function renderSlots() {
   const groups = groupSlotsByDay();
   const daySlots = groups.get(state.dayKey) ?? [];
   els.slots.innerHTML = '';
-  els.slotsEmpty.hidden = daySlots.length > 0;
+  const hasAvailable = daySlots.some((s) => s.available);
+  els.slotsEmpty.hidden = hasAvailable;
+  if (!hasAvailable) {
+    els.slotsEmpty.textContent = daySlots.length > 0
+      ? 'На этот день свободных слотов нет — выберите другой день.'
+      : 'Нет свободных слотов в этом окне.';
+    return;
+  }
   for (const slot of daySlots) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'slot';
     btn.textContent = formatSlotRange(slot);
     btn.disabled = !slot.available;
+    btn.setAttribute('aria-disabled', String(!slot.available));
     btn.addEventListener('click', () => selectSlot(slot));
     els.slots.append(btn);
   }
@@ -185,10 +202,51 @@ els.backToSlots.addEventListener('click', () => {
   showStep(els.stepSlot);
 });
 
+function validateBookingForm() {
+  const nameInput = els.bookingForm.elements.attendeeName;
+  const emailInput = els.bookingForm.elements.attendeeEmail;
+  const name = String(nameInput.value).trim();
+  const email = String(emailInput.value).trim();
+  let valid = true;
+
+  if (!name) {
+    setFieldError(nameInput, 'Укажите ваше имя.');
+    valid = false;
+  }
+  if (!email) {
+    setFieldError(emailInput, 'Укажите email для подтверждения.');
+    valid = false;
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setFieldError(emailInput, 'Похоже, это не email.');
+    valid = false;
+  }
+  return valid;
+}
+
+function renderDone(booking, payload) {
+  els.confirmation.textContent =
+    `Вы записаны на «${state.eventType.title}»: ${formatDateTime(booking.start)}.`;
+  els.doneDetails.innerHTML = '';
+  const rows = [
+    ['Встреча', state.eventType.title],
+    ['Время', formatDateTime(booking.start)],
+    ['Имя', payload.attendeeName],
+    ['Email', payload.attendeeEmail],
+  ];
+  for (const [term, value] of rows) {
+    const dt = document.createElement('dt');
+    dt.textContent = term;
+    const dd = document.createElement('dd');
+    dd.textContent = value;
+    els.doneDetails.append(dt, dd);
+  }
+}
+
 els.bookingForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   clearError();
-  if (!els.bookingForm.reportValidity()) return;
+  clearFieldErrors(els.bookingForm);
+  if (!validateBookingForm()) return;
 
   const formData = new FormData(els.bookingForm);
   const payload = {
@@ -198,10 +256,13 @@ els.bookingForm.addEventListener('submit', async (event) => {
     attendeeEmail: String(formData.get('attendeeEmail')).trim(),
   };
 
+  setBusy(els.bookingSubmit, true, 'Бронируем…', 'Забронировать');
+  for (const input of els.bookingForm.querySelectorAll('input')) {
+    input.disabled = true;
+  }
   try {
     const booking = await createBooking(payload);
-    els.confirmation.textContent =
-      `Вы записаны на «${state.eventType.title}»: ${formatDateTime(booking.start)}.`;
+    renderDone(booking, payload);
     els.bookingForm.reset();
     showStep(els.stepDone);
   } catch (err) {
@@ -216,8 +277,22 @@ els.bookingForm.addEventListener('submit', async (event) => {
     } else {
       showError(err instanceof ApiError ? err.detail : 'Не удалось создать бронирование.');
     }
+  } finally {
+    setBusy(els.bookingSubmit, false);
+    for (const input of els.bookingForm.querySelectorAll('input')) {
+      input.disabled = false;
+    }
   }
 });
+
+for (const input of els.bookingForm.querySelectorAll('input')) {
+  input.addEventListener('input', () => {
+    input.classList.remove('invalid');
+    input.removeAttribute('aria-invalid');
+    const error = input.parentElement.querySelector('.field-error');
+    if (error) error.remove();
+  });
+}
 
 // ── Шаг 4: ещё одна запись ───────────────────────────────────
 

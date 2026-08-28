@@ -23,7 +23,7 @@
       <h2>2. Выберите время <span id="chosen-type" class="muted"></span></h2>
       <div id="days" class="days"></div>
       <div id="slots" class="slots"></div>
-      <p id="slots-empty" class="muted" hidden>Нет свободных слотов в этом окне.</p>
+      <p id="slots-empty" class="empty-state" hidden></p>
     </section>
 
     <!-- Шаг 3: данные гостя -->
@@ -40,7 +40,7 @@
           <input type="email" name="attendeeEmail" required autocomplete="email">
         </label>
         <div class="form-actions">
-          <button type="submit">Забронировать</button>
+          <button type="submit" id="booking-submit">Забронировать</button>
           <button type="button" id="back-to-slots" class="secondary">Назад</button>
         </div>
       </form>
@@ -48,9 +48,15 @@
 
     <!-- Шаг 4: успех -->
     <section id="step-done" hidden>
-      <h2>Готово!</h2>
-      <p id="confirmation"></p>
-      <button id="book-another" class="secondary">Записаться ещё раз</button>
+      <div class="done">
+        <span class="done-icon" aria-hidden="true">✓</span>
+        <h2>Готово!</h2>
+        <p id="confirmation" class="done-text"></p>
+        <dl class="done-details" id="done-details"></dl>
+      </div>
+      <div class="form-actions">
+        <button id="book-another" class="secondary">Записаться ещё раз</button>
+      </div>
     </section>
 
     <p id="error" class="error" role="alert" hidden></p>

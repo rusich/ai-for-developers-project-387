@@ -240,6 +240,12 @@ button.danger:hover:not(:disabled) {
   opacity: 0.75;
 }
 
+.day.today:not(.active) {
+  border-color: var(--accent);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
 .day.active {
   background: var(--accent);
   color: #fff;
@@ -313,9 +319,31 @@ input:focus {
   box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
+input.invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+input.invalid:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.field-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-medium);
+}
+
 .form-actions {
   display: flex;
   gap: var(--space-2);
+}
+
+.form-actions button[disabled],
+button[disabled][aria-busy="true"] {
+  cursor: wait;
 }
 
 /* ── Списки и таблицы ───────────────────────────────────── */
@@ -340,6 +368,33 @@ input:focus {
 
 .list li span {
   flex: 1;
+}
+
+.list li .list-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.list .empty-state {
+  justify-content: center;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+/* ── Пустые состояния ──────────────────────────────────────── */
+
+.empty-state {
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  text-align: center;
+}
+
+.slots + .empty-state {
+  margin-top: var(--space-4);
 }
 
 table {
@@ -435,6 +490,58 @@ a.button-link:focus-visible {
   border: 1px solid var(--danger-border);
   border-left: 4px solid var(--danger);
   border-radius: var(--radius-md);
+}
+
+/* ── Экран «Готово!» ───────────────────────────────────────── */
+
+.done {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.done h2 {
+  margin: var(--space-1) 0 0;
+}
+
+.done-text {
+  margin: 0;
+}
+
+.done-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.done-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-6);
+  margin: var(--space-4) 0 0;
+  text-align: left;
+}
+
+.done-details dt {
+  color: var(--muted);
+}
+
+.done-details dd {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
 }
 
 .footer {

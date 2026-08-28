@@ -26,6 +26,8 @@ test('админ: неверный токен → ошибка, верный т�
   await page.locator('#event-type-form input[name="title"]').fill(EVENT_TYPE_TITLE);
   await page.locator('#event-type-form button[type="submit"]').click();
   await expect(page.locator('#event-types-list')).toContainText(EVENT_TYPE_TITLE);
+  // Созданный тип — единственный в списке, встреч ещё нет → видно пустое состояние.
+  await expect(page.locator('#bookings-empty')).toBeVisible();
 });
 
 test('гость: видит тип события → выбирает слот → заполняет форму → подтверждение', async ({ page }) => {
@@ -42,6 +44,24 @@ test('гость: видит тип события → выбирает слот
 
   await expect(page.locator('#step-done')).toBeVisible();
   await expect(page.locator('#confirmation')).toContainText('Вы записаны');
+  await expect(page.locator('#done-details')).toContainText(GUEST_NAME);
+  await expect(page.locator('#done-details')).toContainText(GUEST_EMAIL);
+});
+
+test('гость: пустая форма → inline-ошибки валидации у полей', async ({ page }) => {
+  await open(page, '/');
+
+  await page.locator('#event-types button').first().click();
+  await expect(page.locator('#step-slot')).toBeVisible();
+  const slot = page.locator('#slots .slot:not([disabled])').first();
+  await expect(slot).toBeVisible();
+  await slot.click();
+  await expect(page.locator('#step-form')).toBeVisible();
+
+  // Отправляем пустую форму — вместо браузерных подсказок показываем inline-ошибки.
+  await page.locator('#booking-form button[type="submit"]').click();
+  await expect(page.locator('#booking-form .field-error')).toHaveCount(2);
+  await expect(page.locator('#booking-form input[name="attendeeName"]')).toHaveClass(/invalid/);
 });
 
 test('гость: бронирование уже занятого времени → ошибка 409 в UI', async ({ page }) => {

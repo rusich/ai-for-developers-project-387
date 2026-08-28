@@ -11,6 +11,7 @@ import {
   ApiError,
 } from './api.js';
 import { formatDateTime } from './format.js';
+import { setFieldError, clearFieldErrors, setBusy } from './ui.js';
 
 const TOKEN_KEY = 'ownerToken';
 
@@ -87,7 +88,7 @@ function renderEventTypes() {
   els.eventTypesList.innerHTML = '';
   if (state.eventTypes.length === 0) {
     const li = document.createElement('li');
-    li.className = 'muted';
+    li.className = 'empty-state';
     li.textContent = 'Типов событий пока нет.';
     els.eventTypesList.append(li);
     return;
@@ -97,6 +98,9 @@ function renderEventTypes() {
 
     const text = document.createElement('span');
     text.textContent = et.description ? `${et.title} — ${et.description}` : et.title;
+
+    const actions = document.createElement('div');
+    actions.className = 'list-actions';
 
     const editBtn = document.createElement('button');
     editBtn.type = 'button';
@@ -110,7 +114,8 @@ function renderEventTypes() {
     deleteBtn.textContent = 'Удалить';
     deleteBtn.addEventListener('click', () => removeEventType(et));
 
-    li.append(text, editBtn, deleteBtn);
+    actions.append(editBtn, deleteBtn);
+    li.append(text, actions);
     els.eventTypesList.append(li);
   }
 }
@@ -133,17 +138,28 @@ function resetForm() {
   els.eventTypeCancel.hidden = true;
 }
 
+function validateTitle() {
+  const input = els.eventTypeForm.elements.title;
+  if (String(input.value).trim()) return true;
+  setFieldError(input, 'Укажите название типа события.');
+  return false;
+}
+
 els.eventTypeCancel.addEventListener('click', resetForm);
 
 els.eventTypeForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   clearError();
-  if (!els.eventTypeForm.reportValidity()) return;
+  clearFieldErrors(els.eventTypeForm);
+  if (!validateTitle()) return;
 
   const title = els.eventTypeForm.elements.title.value.trim();
   const description = els.eventTypeForm.elements.description.value.trim();
   const payload = description ? { title, description } : { title };
+  const idleLabel = state.editingId ? 'Сохранить' : 'Создать';
+  const busyLabel = state.editingId ? 'Сохраняем…' : 'Создаём…';
 
+  setBusy(els.eventTypeSubmit, true, busyLabel, idleLabel);
   try {
     if (state.editingId) {
       await updateEventType(state.token, state.editingId, payload);
@@ -158,7 +174,17 @@ els.eventTypeForm.addEventListener('submit', async (event) => {
     } else {
       showError(err instanceof ApiError ? err.detail : 'Не удалось сохранить тип события.');
     }
+  } finally {
+    setBusy(els.eventTypeSubmit, false, '', state.editingId ? 'Сохранить' : 'Создать');
   }
+});
+
+els.eventTypeForm.elements.title.addEventListener('input', () => {
+  const input = els.eventTypeForm.elements.title;
+  input.classList.remove('invalid');
+  input.removeAttribute('aria-invalid');
+  const error = input.parentElement.querySelector('.field-error');
+  if (error) error.remove();
 });
 
 async function removeEventType(et) {
@@ -215,7 +241,9 @@ els.tokenForm.addEventListener('submit', (event) => {
   state.token = token;
   localStorage.setItem(TOKEN_KEY, token);
   els.tokenForm.reset();
-  loadAll();
+  const submitBtn = els.tokenForm.querySelector('button[type="submit"]');
+  setBusy(submitBtn, true, 'Входим…', 'Войти');
+  loadAll().finally(() => setBusy(submitBtn, false));
 });
 
 els.logout.addEventListener('click', () => {

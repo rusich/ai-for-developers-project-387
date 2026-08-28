@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.5.0](https://github.com/rusich/ai-for-developers-project-387/compare/call-booking-backend-v0.4.0...call-booking-backend-v0.5.0) (2026-08-28)
+
+
+### Features
+
+* внедрить современную дизайн-систему во фронтенд ([ab224ab](https://github.com/rusich/ai-for-developers-project-387/commit/ab224ab63c3ca944ea6bab6ec797063dad2d5a72))
+
+
+### CI
+
+* add opencode workflow for issue and PR comments ([c034bf1](https://github.com/rusich/ai-for-developers-project-387/commit/c034bf136876c6442a8bea120a1b19302ba97c8f))
+
+
+### Documentation
+
+* add agent rules for PR merge and release-please workflow ([f4c417e](https://github.com/rusich/ai-for-developers-project-387/commit/f4c417e61fb79f0250540eb70f2cd89ee827ff37))
+* add UI/UX roadmap and drop deferred DB plans ([70dd56e](https://github.com/rusich/ai-for-developers-project-387/commit/70dd56e912c40c8f38d43b84fa0f8592db410ced))
+* update manifest version and refine release-please troubleshooting ([cefa347](https://github.com/rusich/ai-for-developers-project-387/commit/cefa34796af889948023ed07255641f79e47e9eb))
+
+
+### Build
+
+* **release-please:** release from whole repo ([ae2fbba](https://github.com/rusich/ai-for-developers-project-387/commit/ae2fbba0ef108887e1a61f9a24aa5d5d927a7d21))
+
 ## [0.4.0](https://github.com/rusich/ai-for-developers-project-387/compare/call-booking-backend-v0.3.0...call-booking-backend-v0.4.0) (2026-08-27)
 
 

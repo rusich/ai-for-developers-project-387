@@ -2,7 +2,6 @@
   "packages": {
     ".": {
       "release-type": "rust",
-      "package-name": "call-booking-backend",
       "changelog-path": "CHANGELOG.md",
       "changelog-sections": [
         { "type": "feat", "section": "Features" },

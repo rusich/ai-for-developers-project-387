@@ -17,7 +17,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           # Единый пакет объявлен на корне репозитория (путь "." в
-          # release-please-config.json), релизный компонент — call-booking-backend.
-          # Включаем имя компонента в тег, чтобы теги совпадали с прошлыми
-          # релизами и ссылками в changelog (теги вида call-booking-backend-vX.Y.Z).
-          include-component-in-tag: true
+          # release-please-config.json), поэтому выпускаем версии без
+          # компонентного префикса: теги и релизы вида vX.Y.Z.
+          include-component-in-tag: false

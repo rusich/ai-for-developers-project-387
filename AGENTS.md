@@ -245,7 +245,7 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 - пакет объявлен на **корне репо** → в расчёт берутся conventional-коммиты из всего дерева: фронтенд, бэкенд, спека, e2e, инструменты — любой `feat:`/`fix:` везде двигает версию (фронтовый `feat:` → **MINOR**);
 - версия релиза пишется в `backend/Cargo.toml` и `backend/Cargo.lock` — через `extra-files` (jsonpath `$.package.version` и фильтр по `name` в `[[package]]`); версия в `main`-манифесте хранится по ключу `"."`;
 - пуш в `main` → workflow `release-please.yml` создаёт/обновляет **release-PR** с changelog (`CHANGELOG.md` в корне) и предложенной версией;
-- релизный компонент — `call-booking-backend` (`package-name` в конфиге), поэтому release-PR и теги имеют вид `chore(main): release call-booking-backend 0.x.y` и `call-booking-backend-v0.x.y` (`include-component-in-tag: true`) — совпадает с прошлыми релизами;
+- `package-name` в конфиге не задан и `include-component-in-tag: false` (см. `release-please.yml`), поэтому релиз без компонентного префикса: release-PR имеет вид `chore(main): release 0.x.y`, теги и GitHub-релизы — `v0.x.y` (старые теги вида `call-booking-backend-v0.x.y` остались в истории как релизы предыдущей схемы);
 - синхронность версий: бэкенд отдаёт её через `GET /api/version`, фронт показывает в подвале;
 - мёрдж release-PR → GitHub Release + тег + changelog;
 - после мёрджа release-please делает авто-коммит `chore(main): release <версия>` — это нормально, трогать его не нужно.

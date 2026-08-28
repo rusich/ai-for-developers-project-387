@@ -31,6 +31,7 @@
 | Переменные окружения | `PORT` (default 3000), `OWNER_TOKEN` (default dev-token), `STATIC_DIR` (default frontend) |
 | Порт бэкенда | **3000** (axum default); dev-стаб на Node — порт 4010 (fallback) |
 | Деплой | Один Docker-контейнер: **axum раздаёт и API, и статику** (без отдельного nginx); прод: Railway, деплой **ручной** (`railway up` из корня репо, сборка по `Dockerfile`, запуск по `PORT`, `OWNER_TOKEN=dev-token`); публичная ссылка в README |
+| Тёмная тема | `prefers-color-scheme` + ручной переключатель на обеих страницах; выбор в localStorage (ключ `theme`, режимы авто/светлая/тёмная), токены в CSS-переменных, атрибут `data-theme` на `<html>` |
 
 ## Структура репозитория
 
@@ -47,6 +48,8 @@ frontend/                # vanilla HTML/JS (без сборщиков)
   css/styles.css
   js/api.js              # API-клиент по контракту (без DOM, работает и в Node)
   js/format.js           # форматирование дат: UTC → локальное время (Intl)
+  js/theme.js            # тёмная тема: переключатель + сохранение в localStorage
+  js/ui.js               # общие UI-хелперы (inline-ошибки полей, состояния кнопок)
   js/app.js              # логика страницы гостя
   js/admin.js            # логика страницы владельца
   smoke-test.mjs         # smoke-тест API-клиента (node frontend/smoke-test.mjs [baseUrl] [token])

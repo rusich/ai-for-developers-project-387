@@ -40,6 +40,12 @@
   --surface-hover: #f8fafc;
   --focus-ring: rgba(79, 70, 229, 0.35);
 
+  /* Текст на акцентных подложках (кнопки, активные день/слот, «Готово!»).
+     Отдельный токен: в светлой теме — белый на тёмном акценте, в тёмной —
+     тёмный на светлом акценте (см. блок тёмной темы ниже). */
+  --on-accent: #ffffff;
+  --on-success: #ffffff;
+
   /* Тени */
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
@@ -66,6 +72,88 @@
 
   /* Анимации */
   --transition: 150ms ease;
+
+  /* Нативный рендер контролов/скроллбаров под светлую тему;
+     тёмная переопределяет через color-scheme: dark в блоке ниже. */
+  color-scheme: light;
+}
+
+/* ── Тёмная тема ─────────────────────────────────────────────
+   Два источника включения:
+   - система: @media (prefers-color-scheme: dark) — пока пользователь
+     не выбрал тему явно (нет атрибута data-theme или стоит "light");
+   - явный выбор: атрибут data-theme="dark" на <html> (ставит JS,
+     выбор сохраняется в localStorage, см. js/theme.js).
+   Палитра строится на тех же Tailwind-шкалах (slate/indigo/red/green),
+   что и светлая, чтобы сохранить консистентность токенов. Акцент
+   становится светлее (indigo-400/300) с тёмным текстом на нём. */
+:root[data-theme="dark"] {
+  --accent: #818cf8;
+  --accent-hover: #a5b4fc;
+  --accent-soft: rgba(129, 140, 248, 0.14);
+  --accent-text: #a5b4fc;
+  --danger: #f87171;
+  --danger-hover: #fca5a5;
+  --danger-soft: rgba(248, 113, 113, 0.12);
+  --danger-border: #991b1b;
+  --success: #4ade80;
+
+  --text: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  --border: #334155;
+  --border-strong: #475569;
+
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-hover: #334155;
+  --focus-ring: rgba(129, 140, 248, 0.4);
+
+  --on-accent: #0f172a;
+  --on-success: #0f172a;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --accent: #818cf8;
+    --accent-hover: #a5b4fc;
+    --accent-soft: rgba(129, 140, 248, 0.14);
+    --accent-text: #a5b4fc;
+    --danger: #f87171;
+    --danger-hover: #fca5a5;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --danger-border: #991b1b;
+    --success: #4ade80;
+
+    --text: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --muted: #94a3b8;
+    --border: #334155;
+    --border-strong: #475569;
+
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-hover: #334155;
+    --focus-ring: rgba(129, 140, 248, 0.4);
+
+    --on-accent: #0f172a;
+    --on-success: #0f172a;
+
+    color-scheme: dark;
+  }
+}
+
+/* Плавная смена темы: класс вешается JS на время перехода (см. js/theme.js),
+   иначе фоны/цвета меняются скачком без общего фейда. */
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
 }
 
 * {
@@ -114,7 +202,7 @@ button {
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition:
@@ -248,13 +336,13 @@ button.danger:hover:not(:disabled) {
 
 .day.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border-color: var(--accent);
 }
 
 .day.active:hover:not(:disabled) {
   background: var(--accent-hover);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .slots {
@@ -271,7 +359,7 @@ button.danger:hover:not(:disabled) {
 
 .slot:hover:not(:disabled) {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border-color: var(--accent);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
@@ -445,6 +533,14 @@ tbody tr:hover {
   gap: var(--space-2);
 }
 
+/* ── Верхняя панель (переключатель темы) ─────────────────── */
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+
 /* ── Ссылки в виде кнопок ─────────────────────────────────── */
 
 a.button-link {
@@ -521,7 +617,7 @@ a.button-link:focus-visible {
   height: 48px;
   border-radius: 50%;
   background: var(--success);
-  color: #fff;
+  color: var(--on-success);
   font-size: 1.5rem;
   font-weight: var(--font-weight-bold);
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);

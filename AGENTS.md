@@ -190,6 +190,13 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
   railway up --service ai-for-developers-project-387 --environment production --project 736cb113-e32d-4e75-8836-73c6657a5bc2 --message "описание"
   ```
   CLI установлен локально (`~/.railway/bin/railway`, авторизация через `railway login`).
+  **Внимание, параметры команд различаются:** `railway up`/`logs` принимают `--service`, а `railway status` — **НЕ принимает** `--service` (только `--project` + `--environment`). Вызов `railway status --service ...` падает с `error: unexpected argument '--service' found`.
+  Проверка после деплоя (статус, лог деплоя, ответ приложения):
+  ```bash
+  railway status --project 736cb113-e32d-4e75-8836-73c6657a5bc2 --environment production
+  railway logs --service ai-for-developers-project-387 --environment production --project 736cb113-e32d-4e75-8836-73c6657a5bc2 --deployment --lines 30
+  curl -s https://ai-for-developers-project-387-production-bb87.up.railway.app/api/version
+  ```
 - `railway_redeploy` (MCP) переиспользует **старую сборку** — для выката нового кода не годится, только `railway up`.
 - Сеть пользователя блокирует домен без VPN — для проверок прод-ссылки включать VPN.
 - Данные in-memory: каждый деплой сбрасывает типы событий и бронирования.

@@ -602,6 +602,14 @@ a.button-link:focus-visible {
   text-align: center;
 }
 
+#step-done .done {
+  margin-top: var(--space-8);
+}
+
+#step-done .form-actions {
+  margin-top: var(--space-6);
+}
+
 .done h2 {
   margin: var(--space-1) 0 0;
 }

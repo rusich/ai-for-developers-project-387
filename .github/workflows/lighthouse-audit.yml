@@ -2,7 +2,7 @@ name: Lighthouse Audit
 
 on:
   schedule:
-    - cron: "0 3 * * *"        # каждый день в 03:00 UTC
+    - cron: "0 4 * * *"        # каждый день в 04:00 UTC
   workflow_dispatch: {}        # ручной запуск из вкладки Actions
 
 permissions:

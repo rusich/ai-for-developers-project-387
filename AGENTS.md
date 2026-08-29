@@ -66,7 +66,7 @@ e2e/                     # интеграционные e2e-тесты (Playwrig
   playwright.config.ts   # webServer: бэкенд 3000 + статика 8080, chromium, UTC
   tests/booking-flow.spec.ts  # основной сценарий бронирования (4 теста, serial)
   scenarios.md           # описание пользовательских сценариев
-.github/workflows/       # ci.yml (тесты), release-please.yml (релизы), hexlet-check.yml (не трогать)
+.github/workflows/       # ci.yml (тесты), lighthouse-audit.yml (ночной аудит производительности), release-please.yml (релизы), hexlet-check.yml (не трогать)
 release-please-config.json    # конфиг release-please (пакет на корне ".", release-type: rust)
 .release-please-manifest.json # версия релизного компонента call-booking-backend (0.4.0)
 CHANGELOG.md                  # changelog релизов (ведёт release-please, в корне репо)
@@ -180,6 +180,32 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 **CORS-заголовки обязательны**: фронт (8080) и API (3000/4010) — разные origins. Бэкенд и стаб отвечают на preflight полным набором: эхо `Access-Control-Request-Headers`, `Access-Control-Allow-Private-Network: true` (Private Network Access в Chrome/Firefox), чистый 204. Без этого админка с заголовком `X-Owner-Token` блокируется браузером.
 
 В проде (Docker) axum раздаёт статику с того же origin — `apiBase` не нужен (по умолчанию пустая строка = тот же origin).
+
+## Регулярный Lighthouse-аудит (ночной отчёт)
+
+Workflow `.github/workflows/lighthouse-audit.yml` гоняет Google Lighthouse по обеим страницам прода (**гость** + **admin.html**)
+и сохраняет отчёт, чтобы утром команда посмотрела его и решила, нужны ли правки.
+
+- **Запуск по расписанию:** каждый день в **03:00 UTC** (`cron: "0 3 * * *"`; GitHub Actions работает в UTC).
+- **Ручной запуск:** вкладка Actions → «Lighthouse Audit» → **Run workflow** (можно выбрать ветку — удобно для проверки перед мёрджем).
+- **Где смотреть утром:** на странице run во вкладке **Summary** — таблица с баллами категорий
+  (Performance / Accessibility / Best-Practices / SEO) и метриками LCP / CLS / INP; полный отчёт — в артефакте
+  **`lighthouse-reports`** (JSON + HTML, хранится 30 дней; HTML открывается в браузере).
+- **Никаких правок отчёт сам не делает** — метрики только замеряются и публикуются.
+
+**Как зафиксировать правки по отчёту** (шаг «по итогам отчёта»):
+
+1. Открыть Summary/артефакты последнего запуска, найти метрики в красной зоне Core Web Vitals
+   (LCP > 2.5 s, CLS > 0.1, INP > 200 ms) или просадки категорий (< 90%).
+2. Создать issue с описанием проблемы и конкретной правкой. Вручную:
+   ```bash
+   gh issue create --title "Perf: LCP 3.2s на гостевой странице" \
+     --label performance \
+     --body "Источник: Lighthouse Audit от <дата> (ссылка на run/артефакт). Что и где править: ..."
+   ```
+   Либо через веб-интерфейс Issues → New issue. Можно попросить и агента:
+   оставить на любом issue/PR комментарий `/oc Опиши по отчёту Lighthouse (Summary run <NNN>) правки для фронтенда и оформи как issue`.
+3. Реализовать правку отдельным PR, прогнать `just e2e`/`just test-smoke`, задеплоить `railway up`.
 
 ## Продакшн (Railway)
 

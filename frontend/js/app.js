@@ -7,13 +7,20 @@ import {
   getVersion,
   ApiError,
 } from './api.js';
-import {
-  formatDay,
-  formatSlotRange,
-  formatDateTime,
-  localDayKey,
-} from './format.js';
-import { setFieldError, clearFieldErrors, setBusy } from './ui.js';
+
+// format.js и ui.js нужны только на шагах 2–3 (выбор слота и форма).
+// Подгружаем их по требованию, чтобы на старте страницы не оценивать
+// лишние модули на главном потоке (снижает worst-case Total Blocking Time).
+let formatModule;
+function loadFormat() {
+  formatModule ??= import('./format.js');
+  return formatModule;
+}
+let uiModule;
+function loadUi() {
+  uiModule ??= import('./ui.js');
+  return uiModule;
+}
 
 const state = {
   eventTypes: [],
@@ -23,7 +30,7 @@ const state = {
   slot: null,        // выбранный слот
 };
 
-const todayKey = localDayKey(new Date().toISOString());
+let todayKey;        // локальный день «сегодня», вычисляется при первом рендере дней
 
 const els = {
   stepType: document.querySelector('#step-type'),
@@ -118,11 +125,11 @@ async function selectEventType(et) {
     showError(err instanceof ApiError ? err.detail : 'Не удалось загрузить слоты.');
     return;
   }
-  renderDays();
-  renderSlots();
+  await renderDays();
+  await renderSlots();
 }
 
-function groupSlotsByDay() {
+function groupSlotsByDay(localDayKey) {
   const groups = new Map();
   for (const slot of state.slots) {
     const key = localDayKey(slot.start);
@@ -132,8 +139,10 @@ function groupSlotsByDay() {
   return groups;
 }
 
-function renderDays() {
-  const groups = groupSlotsByDay();
+async function renderDays() {
+  const { formatDay, localDayKey } = await loadFormat();
+  todayKey ??= localDayKey(new Date().toISOString());
+  const groups = groupSlotsByDay(localDayKey);
   els.days.innerHTML = '';
   const keys = [...groups.keys()];
   if (keys.length === 0) {
@@ -155,17 +164,18 @@ function renderDays() {
     btn.setAttribute('aria-pressed', String(key === state.dayKey));
     btn.textContent = formatDay(daySlots[0].start);
     if (!daySlots.some((s) => s.available)) btn.classList.add('full');
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       state.dayKey = key;
-      renderDays();
-      renderSlots();
+      await renderDays();
+      await renderSlots();
     });
     els.days.append(btn);
   }
 }
 
-function renderSlots() {
-  const groups = groupSlotsByDay();
+async function renderSlots() {
+  const { localDayKey, formatSlotRange } = await loadFormat();
+  const groups = groupSlotsByDay(localDayKey);
   const daySlots = groups.get(state.dayKey) ?? [];
   els.slots.innerHTML = '';
   const hasAvailable = daySlots.some((s) => s.available);
@@ -190,9 +200,10 @@ function renderSlots() {
 
 // ── Шаг 3: форма ─────────────────────────────────────────────
 
-function selectSlot(slot) {
+async function selectSlot(slot) {
   clearError();
   state.slot = slot;
+  const { formatDateTime, formatSlotRange } = await loadFormat();
   els.chosenSlot.textContent = `${formatDateTime(slot.start)} — ${formatSlotRange(slot)}`;
   showStep(els.stepForm);
 }
@@ -202,7 +213,7 @@ els.backToSlots.addEventListener('click', () => {
   showStep(els.stepSlot);
 });
 
-function validateBookingForm() {
+function validateBookingForm(setFieldError) {
   const nameInput = els.bookingForm.elements.attendeeName;
   const emailInput = els.bookingForm.elements.attendeeEmail;
   const name = String(nameInput.value).trim();
@@ -223,7 +234,7 @@ function validateBookingForm() {
   return valid;
 }
 
-function renderDone(booking, payload) {
+function renderDone(booking, payload, formatDateTime) {
   els.confirmation.textContent =
     `Вы записаны на «${state.eventType.title}»: ${formatDateTime(booking.start)}.`;
   els.doneDetails.innerHTML = '';
@@ -245,8 +256,10 @@ function renderDone(booking, payload) {
 els.bookingForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   clearError();
+  const { setFieldError, clearFieldErrors, setBusy } = await loadUi();
+  const { formatDateTime } = await loadFormat();
   clearFieldErrors(els.bookingForm);
-  if (!validateBookingForm()) return;
+  if (!validateBookingForm(setFieldError)) return;
 
   const formData = new FormData(els.bookingForm);
   const payload = {
@@ -262,7 +275,7 @@ els.bookingForm.addEventListener('submit', async (event) => {
   }
   try {
     const booking = await createBooking(payload);
-    renderDone(booking, payload);
+    renderDone(booking, payload, formatDateTime);
     els.bookingForm.reset();
     showStep(els.stepDone);
   } catch (err) {
@@ -271,8 +284,8 @@ els.bookingForm.addEventListener('submit', async (event) => {
       showError('Это время уже заняли. Выберите другой слот.');
       state.slot = null;
       state.slots = await getSlots(state.eventType.id);
-      renderDays();
-      renderSlots();
+      await renderDays();
+      await renderSlots();
       showStep(els.stepSlot);
     } else {
       showError(err instanceof ApiError ? err.detail : 'Не удалось создать бронирование.');

@@ -10,7 +10,7 @@ use std::path::PathBuf;
 
 use axum::body::Body;
 use axum::extract::DefaultBodyLimit;
-use axum::http::Request;
+use axum::http::{header, HeaderValue, Request};
 use axum::middleware::from_fn;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
@@ -54,7 +54,14 @@ pub fn build_app(state: AppState, static_dir: impl Into<PathBuf>) -> Router {
                 .oneshot(req)
                 .await
                 .unwrap_or_else(|err| match err {});
-            resp.map(|body| Body::new(body))
+            let mut resp = resp.map(|body| Body::new(body));
+            // Статика почти не меняется между релизами: разрешаем короткий кэш в браузере,
+            // чтобы повторные визиты не качали JS/CSS заново (Lighthouse: cache policy).
+            resp.headers_mut().insert(
+                header::CACHE_CONTROL,
+                HeaderValue::from_static("public, max-age=3600"),
+            );
+            resp
         }
     };
     build_router(state).fallback(static_handler)

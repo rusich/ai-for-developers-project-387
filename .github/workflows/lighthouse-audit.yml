@@ -1,0 +1,51 @@
+name: Lighthouse Audit
+
+on:
+  schedule:
+    - cron: "0 3 * * *"        # каждый день в 03:00 UTC
+  workflow_dispatch: {}        # ручной запуск из вкладки Actions
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Lighthouse — гостевая страница
+        run: |
+          mkdir -p reports
+          npx --yes lighthouse "https://ai-for-developers-project-387-production-bb87.up.railway.app" \
+            --output=json,html --output-path="reports/index" \
+            --chrome-flags="--headless --no-sandbox" --quiet
+
+      - name: Lighthouse — админка
+        run: |
+          npx --yes lighthouse "https://ai-for-developers-project-387-production-bb87.up.railway.app/admin.html" \
+            --output=json,html --output-path="reports/admin" \
+            --chrome-flags="--headless --no-sandbox" --quiet
+
+      - name: Сводка в summary
+        run: |
+          {
+            echo "## Lighthouse Audit — $(date -u +%F\ %T\ UTC)"
+            echo ""
+            echo "| Страница | Perf | A11y | Best-Practices | SEO | LCP | CLS | INP |"
+            echo "|---|---|---|---|---|---|---|---|"
+            for f in reports/index.json reports/admin.json; do
+              jq -r '["| ", .finalUrl, " | ", ((.categories.performance.score*100)|floor), "% | ", ((.categories.accessibility.score*100)|floor), "% | ", ((.categories["best-practices"].score*100)|floor), "% | ", ((.categories.seo.score*100)|floor), "% | ", .audits["largest-contentful-paint"].displayValue, " | ", .audits["cumulative-layout-shift"].displayValue, " | ", .audits["interaction-to-next-paint"].displayValue, " |"] | join("")' "$f"
+            done
+            echo ""
+            echo "Полный отчёт: вкладка Artifacts (файл lighthouse-reports)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: reports/
+          retention-days: 30

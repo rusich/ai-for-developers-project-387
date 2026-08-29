@@ -186,7 +186,8 @@ PLAYWRIGHT_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium npx playwright te
 Workflow `.github/workflows/lighthouse-audit.yml` гоняет Google Lighthouse по обеим страницам прода (**гость** + **admin.html**)
 и сохраняет отчёт, чтобы утром команда посмотрела его и решила, нужны ли правки.
 
-- **Запуск по расписанию:** каждый день в **04:00 UTC** (`cron: "0 4 * * *"`; GitHub Actions работает в UTC).
+- **Запуск по расписанию:** каждый день в **04:17 UTC** (`cron: "17 4 * * *"`; GitHub Actions работает в UTC).
+
 - **Ручной запуск:** вкладка Actions → «Lighthouse Audit» → **Run workflow** (можно выбрать ветку — удобно для проверки перед мёрджем).
 - **Где смотреть утром:** на странице run во вкладке **Summary** — таблица с баллами категорий
   (Performance / Accessibility / Best-Practices / SEO) и метриками LCP / CLS / TBT; полный отчёт — в артефакте

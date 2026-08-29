@@ -189,14 +189,14 @@ Workflow `.github/workflows/lighthouse-audit.yml` гоняет Google Lighthouse
 - **Запуск по расписанию:** каждый день в **03:00 UTC** (`cron: "0 3 * * *"`; GitHub Actions работает в UTC).
 - **Ручной запуск:** вкладка Actions → «Lighthouse Audit» → **Run workflow** (можно выбрать ветку — удобно для проверки перед мёрджем).
 - **Где смотреть утром:** на странице run во вкладке **Summary** — таблица с баллами категорий
-  (Performance / Accessibility / Best-Practices / SEO) и метриками LCP / CLS / INP; полный отчёт — в артефакте
+  (Performance / Accessibility / Best-Practices / SEO) и метриками LCP / CLS / TBT; полный отчёт — в артефакте
   **`lighthouse-reports`** (JSON + HTML, хранится 30 дней; HTML открывается в браузере).
 - **Никаких правок отчёт сам не делает** — метрики только замеряются и публикуются.
 
 **Как зафиксировать правки по отчёту** (шаг «по итогам отчёта»):
 
 1. Открыть Summary/артефакты последнего запуска, найти метрики в красной зоне Core Web Vitals
-   (LCP > 2.5 s, CLS > 0.1, INP > 200 ms) или просадки категорий (< 90%).
+   (LCP > 2.5 s, CLS > 0.1, TBT > 600 ms) или просадки категорий (< 90%).
 2. Создать issue с описанием проблемы и конкретной правкой. Вручную:
    ```bash
    gh issue create --title "Perf: LCP 3.2s на гостевой странице" \

@@ -34,10 +34,10 @@ jobs:
           {
             echo "## Lighthouse Audit — $(date -u +%F\ %T\ UTC)"
             echo ""
-            echo "| Страница | Perf | A11y | Best-Practices | SEO | LCP | CLS | INP |"
+            echo "| Страница | Perf | A11y | Best-Practices | SEO | LCP | CLS | TBT |"
             echo "|---|---|---|---|---|---|---|---|"
             for f in reports/index.report.json reports/admin.report.json; do
-              jq -r '["| ", .finalUrl, " | ", ((.categories.performance.score*100)|floor), "% | ", ((.categories.accessibility.score*100)|floor), "% | ", ((.categories["best-practices"].score*100)|floor), "% | ", ((.categories.seo.score*100)|floor), "% | ", .audits["largest-contentful-paint"].displayValue, " | ", .audits["cumulative-layout-shift"].displayValue, " | ", .audits["interaction-to-next-paint"].displayValue, " |"] | join("")' "$f"
+              jq -r '["| ", .finalUrl, " | ", ((.categories.performance.score*100)|floor), "% | ", ((.categories.accessibility.score*100)|floor), "% | ", ((.categories["best-practices"].score*100)|floor), "% | ", ((.categories.seo.score*100)|floor), "% | ", .audits["largest-contentful-paint"].displayValue, " | ", .audits["cumulative-layout-shift"].displayValue, " | ", .audits["total-blocking-time"].displayValue, " |"] | join("")' "$f"
             done
             echo ""
             echo "Полный отчёт: вкладка Artifacts (файл lighthouse-reports)."

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.2](https://github.com/rusich/ai-for-developers-project-387/compare/v0.5.1...v0.5.2) (2026-08-29)
+
+
+### CI
+
+* add nightly lighthouse audit workflow ([#18](https://github.com/rusich/ai-for-developers-project-387/issues/18)) ([521b610](https://github.com/rusich/ai-for-developers-project-387/commit/521b610568702012cb506246a697fd79cf3578db))
+* fix lighthouse report paths in summary step ([#20](https://github.com/rusich/ai-for-developers-project-387/issues/20)) ([ce96260](https://github.com/rusich/ai-for-developers-project-387/commit/ce9626023bc2c13577d4f6c86eccdf3456b3ff34))
+* run lighthouse audit at 04:17 UTC instead of 04:00 ([#26](https://github.com/rusich/ai-for-developers-project-387/issues/26)) ([47d87a8](https://github.com/rusich/ai-for-developers-project-387/commit/47d87a86cb1f2e2f9682e4a5cad49599d8dab411))
+* run lighthouse audit at 05:17 UTC ([#27](https://github.com/rusich/ai-for-developers-project-387/issues/27)) ([e0a6645](https://github.com/rusich/ai-for-developers-project-387/commit/e0a6645f3253d3994bbbae0af958187c0ed3ab21))
+* schedule lighthouse audit at 04:00 UTC ([#24](https://github.com/rusich/ai-for-developers-project-387/issues/24)) ([8b9d93b](https://github.com/rusich/ai-for-developers-project-387/commit/8b9d93b4fadcf2ce4ee04440e8df0d210f541717))
+* show TBT instead of INP in lighthouse summary ([#21](https://github.com/rusich/ai-for-developers-project-387/issues/21)) ([381b03d](https://github.com/rusich/ai-for-developers-project-387/commit/381b03dad458588554af30b36f5ff214188c6583))
+
 ## [0.5.1](https://github.com/rusich/ai-for-developers-project-387/compare/v0.5.0...v0.5.1) (2026-08-28)
 
 
